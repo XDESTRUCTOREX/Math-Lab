@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from modelos.mezclas import resolver_mezclas
+from  backend.modelos.mezclas import resolver_mezclas
 
 mezclas_bp = Blueprint("mezclas", __name__)
 

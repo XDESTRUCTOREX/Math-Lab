@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from modelos.decaimiento import resolver_decaimiento
+from  backend.modelos.decaimiento import resolver_decaimiento
 
 decaimiento_bp = Blueprint("decaimiento", __name__)
 

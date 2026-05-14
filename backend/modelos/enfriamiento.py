@@ -3,7 +3,7 @@ from sympy import (
     Symbol, Function, latex
 )
 from sympy import ln
-from utils.validacion import (
+from backend.utils.validacion import (
     validar_numero, validar_campo_requerido, crear_respuesta_error
 )
 

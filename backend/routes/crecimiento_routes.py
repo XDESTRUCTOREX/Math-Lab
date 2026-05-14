@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from modelos.crecimiento import resolver_crecimiento
+from  backend.modelos.crecimiento import resolver_crecimiento
 
 crecimiento_bp = Blueprint("crecimiento", __name__)
 

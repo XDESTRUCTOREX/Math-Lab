@@ -3,10 +3,10 @@
 from flask import Flask, render_template
 from flask_cors import CORS
 
-from routes.enfriamiento_routes import enfriamiento_bp
-from routes.mezclas_routes import mezclas_bp
-from routes.crecimiento_routes import crecimiento_bp
-from routes.decaimiento_routes import decaimiento_bp
+from backend.routes.enfriamiento_routes import enfriamiento_bp
+from backend.routes.mezclas_routes import mezclas_bp
+from backend.routes.crecimiento_routes import crecimiento_bp
+from backend.routes.decaimiento_routes import decaimiento_bp
 
 app = Flask(
     __name__,

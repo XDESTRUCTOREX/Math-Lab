@@ -1,6 +1,6 @@
 from sympy import *
 from sympy import ln
-from utils.validacion import (
+from backend.utils.validacion import (
     validar_numero, validar_positivo, validar_no_negativo, 
     validar_campo_requerido, crear_respuesta_error
 )

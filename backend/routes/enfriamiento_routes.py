@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
 
-from modelos.enfriamiento import resolver_enfriamiento
+from  backend.modelos.enfriamiento import resolver_enfriamiento
 
 enfriamiento_bp = Blueprint("enfriamiento", __name__)
 
