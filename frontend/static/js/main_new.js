@@ -131,7 +131,7 @@ async function resolverModelo() {
             else if (tipoCalculo === "tiempo") {
                 datos.temperatura_objetivo = document.getElementById("temperatura_objetivo").value;
             }
-            url = "http://127.0.0.1:5000/resolver/enfriamiento";
+            url = "/resolver/enfriamiento";
         }
 
         // =====================================
@@ -168,7 +168,7 @@ async function resolverModelo() {
                 datos.concentracion_objetivo = document.getElementById("concentracion_objetivo").value;
             }
 
-            url = "http://127.0.0.1:5000/resolver/mezclas";
+            url = "/resolver/mezclas";
         }
 
         // Validar que los campos requeridos no estén vacíos

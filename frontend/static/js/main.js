@@ -97,7 +97,7 @@ async function resolverModelo() {
             else if (tipoCalculo === "tiempo") {
                 datos.temperatura_objetivo = document.getElementById("temperatura_objetivo").value;
             }
-            url = "http://127.0.0.1:5000/resolver/enfriamiento";
+            url = "/resolver/enfriamiento";
         }
 
         // =====================================
@@ -133,7 +133,7 @@ async function resolverModelo() {
                 datos.cantidad_objetivo = document.getElementById("cantidad_objetivo").value;
             }
 
-            url = "http://127.0.0.1:5000/resolver/mezclas";
+            url = "/resolver/mezclas";
         }
 
         // =====================================
@@ -156,7 +156,7 @@ async function resolverModelo() {
                 datos.cantidad_objetivo = document.getElementById("cantidad_objetivo").value;
             }
 
-            url = "http://127.0.0.1:5000/resolver/crecimiento";
+            url = "/resolver/crecimiento";
         }
 
         // =====================================
@@ -179,7 +179,7 @@ async function resolverModelo() {
                 datos.cantidad_objetivo = document.getElementById("cantidad_objetivo").value;
             }
 
-            url = "http://127.0.0.1:5000/resolver/decaimiento";
+            url = "/resolver/decaimiento";
         }
 
 
