@@ -1,0 +1,37 @@
+.sidebar {
+    width: 280px;
+    background: linear-gradient(180deg, #111827, #0B1020);
+    border-right: 1px solid rgba(255,255,255,.05);
+    padding: 30px 20px;
+}
+
+.logo {
+    margin-bottom: 40px;
+}
+
+.logo h1 {
+    color: #3B82F6;
+    margin-bottom: 10px;
+}
+
+.logo p {
+    color: #94A3B8;
+}
+
+.menu-modelos {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.modelo-btn {
+    background: #121A2F;
+    border: 1px solid transparent;
+    color: white;
+    padding: 15px;
+    border-radius: 15px;
+    cursor: pointer;
+    transition: .3s;
+    text-align: left;
+    font-size: 15px;
+}

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> Sistema Inteligente </title>
+    <!-- ESTILOS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/global.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/sidebar.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/formulario.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/resultados.css') }}">
+    <!-- MATHJAX -->
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <!-- JS -->
+    <script defer src="{{ url_for('static', filename='js/modelos.js') }}"></script>
+    <script defer src="{{ url_for('static', filename='js/formulario.js') }}"></script>
+    <script defer src="{{ url_for('static', filename='js/main.js') }}"></script>
+</head>
+
+<body>
+    <div class="contenedor-principal">
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+            <div class="logo">
+                <h1> ∫ MathLab </h1>
+                <p> Ecuaciones Diferenciales </p>
+            </div>
+
+            <nav class="menu-modelos">
+                <button class="modelo-btn active" data-modelo="enfriamiento"> 🌡 Enfriamiento </button>
+                <button class="modelo-btn" data-modelo="mezclas"> 🧪 Mezclas </button>
+                <button class="modelo-btn" data-modelo="crecimiento"> 📈 Crecimiento </button>
+                <button class="modelo-btn" data-modelo="decaimiento"> 📉 Decaimiento </button>
+            </nav>
+        </aside>
+
+        <!-- PANEL -->
+        <main class="panel-central">
+            <!-- HEADER -->
+            <section class="header-panel">
+                <h2 id="titulo-modelo">  Ley de Enfriamiento </h2>
+                <p> Sistema inteligente para resolución matemática paso a paso. </p>
+            </section>
+
+            <!-- FORM -->
+            <section class="card formulario-card">
+                <div class="card-header">
+                    <h3> Datos del problema </h3>
+                </div>
+
+                <form id="formulario-dinamico"></form>
+
+                <button id="resolver-btn"> Resolver Modelo </button>
+            </section>
+
+            <!-- RESULTADOS -->
+            <section class="card resultados-card">
+                <div class="card-header">
+                    <h3> Procedimiento Matemático </h3>
+                </div>
+
+                <div id="resultado-contenedor">
+                    <div class="placeholder">
+                        <h2> Esperando resolución...</h2>
+                        <p> Selecciona un modelo y completa el formulario.</p>
+                    </div>
+
+                </div>
+
+            </section>
+
+        </main>
+
+    </div>
+
+</body>
+
+</html>

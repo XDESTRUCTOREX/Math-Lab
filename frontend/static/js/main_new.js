@@ -1,0 +1,277 @@
+let modeloActual = "enfriamiento";
+
+// =====================================
+// FORMULARIO INICIAL
+// =====================================
+
+generarFormulario(modeloActual);
+
+
+// =====================================
+// BOTONES MODELOS
+// =====================================
+
+const botones = document.querySelectorAll(".modelo-btn");
+
+botones.forEach(btn => {
+    btn.addEventListener("click", () => {
+        botones.forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        modeloActual = btn.dataset.modelo;
+        generarFormulario(modeloActual);
+        limpiarResultados();
+    });
+});
+
+// =====================================
+// LIMPIAR RESULTADOS
+// =====================================
+
+function limpiarResultados() {
+    const contenedor = document.getElementById("resultado-contenedor");
+    contenedor.innerHTML = `
+
+        <div class="placeholder">
+
+            <h2>
+                Esperando resolución...
+            </h2>
+
+            <p>
+                Completa los datos del nuevo cálculo.
+            </p>
+
+        </div>
+    `;
+}
+
+// =====================================
+// VALIDAR CAMPOS
+// =====================================
+
+function validarCampos(datos, modeloActual) {
+    const camposRequeridos = [];
+
+    if (modeloActual === "enfriamiento") {
+        camposRequeridos.push("ambiente", "inicial", "medida", "tiempo_medida");
+    } else if (modeloActual === "mezclas") {
+        camposRequeridos.push("volumen", "caudal_entrada", "concentracion_entrada", "caudal_salida");
+    }
+
+    for (const campo of camposRequeridos) {
+        if (!datos[campo] || datos[campo] === "") {
+            throw new Error(`Campo requerido vacío: ${campo.replace(/_/g, " ")}`);
+        }
+    }
+}
+
+// =====================================
+// MOSTRAR ERRORES
+// =====================================
+
+function mostrarError(mensaje) {
+    const contenedor = document.getElementById("resultado-contenedor");
+    contenedor.innerHTML = `
+        <div class="resultado-error" style="padding: 20px; background-color: #fee; border: 1px solid #fcc; border-radius: 8px; color: #c00;">
+            <h3 style="margin-top: 0;">❌ Error</h3>
+            <p>${mensaje}</p>
+        </div>
+    `;
+}
+
+// =====================================
+// BOTÓN RESOLVER
+// =====================================
+
+document.getElementById("resolver-btn").addEventListener("click", resolverModelo);
+
+
+// =====================================
+// RESOLVER MODELO
+// =====================================
+
+async function resolverModelo() {
+    try {
+
+        let datos = {};
+        let url = "";
+
+        // =====================================
+        // LEER TIPO
+        // =====================================
+
+        const tipoCalculo = document.getElementById("tipo-calculo").value;
+
+        // =====================================
+        // ENFRIAMIENTO
+        // =====================================
+
+        if (modeloActual === "enfriamiento") {
+            datos = {
+
+                tipo_calculo: tipoCalculo,
+                ambiente: document.getElementById("ambiente").value,
+                inicial: document.getElementById("inicial").value,
+                medida: document.getElementById("medida").value,
+                tiempo_medida: document.getElementById("tiempo_medida").value
+            };
+
+            // =====================================
+            // CALCULAR TEMPERATURA
+            // =====================================
+            if (tipoCalculo === "temperatura") {
+                datos.tiempo_buscar = document.getElementById("tiempo_buscar").value;
+            }
+
+
+            // =====================================
+            // CALCULAR TIEMPO
+            // =====================================
+
+            else if (tipoCalculo === "tiempo") {
+                datos.temperatura_objetivo = document.getElementById("temperatura_objetivo").value;
+            }
+            url = "http://127.0.0.1:5000/resolver/enfriamiento";
+        }
+
+        // =====================================
+        // MEZCLAS
+        // =====================================
+
+        else if (modeloActual === "mezclas") {
+
+            datos = {
+
+                tipo_calculo: tipoCalculo,
+                volumen: document.getElementById("volumen").value,
+                cantidad_inicial: document.getElementById("cantidad_inicial").value,
+                concentracion_inicial: document.getElementById("concentracion_inicial").value,
+                caudal_entrada: document.getElementById("caudal_entrada").value,
+                concentracion_entrada: document.getElementById("concentracion_entrada").value,
+                caudal_salida: document.getElementById("caudal_salida").value
+            };
+
+            // =====================================
+            // CALCULAR CANTIDAD
+            // =====================================
+
+            if (tipoCalculo === "cantidad") {
+                datos.tiempo_buscar = document.getElementById("tiempo_buscar").value;
+            }
+
+            // =====================================
+            // CALCULAR TIEMPO
+            // =====================================
+
+            else if (tipoCalculo === "tiempo") {
+                datos.cantidad_objetivo = document.getElementById("cantidad_objetivo").value;
+                datos.concentracion_objetivo = document.getElementById("concentracion_objetivo").value;
+            }
+
+            url = "http://127.0.0.1:5000/resolver/mezclas";
+        }
+
+        // Validar que los campos requeridos no estén vacíos
+        validarCampos(datos, modeloActual);
+
+        // =====================================
+        // LIMPIAR
+        // =====================================
+
+        limpiarResultados();
+
+        // =====================================
+        // FETCH
+        // =====================================
+
+        const respuesta = await fetch(url, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(datos)
+        });
+
+        // =====================================
+        // JSON
+        // =====================================
+
+        const resultado = await respuesta.json();
+
+        // =====================================
+        // VERIFICAR ERRORES
+        // =====================================
+
+        if (resultado.error) {
+            mostrarError(resultado.mensaje);
+            return;
+        }
+
+        // =====================================
+        // MOSTRAR
+        // =====================================
+        mostrarResultado(resultado);
+    }
+
+    catch (error) {
+        mostrarError(error.message || "Error desconocido al procesar la solicitud");
+    }
+}
+
+
+// =====================================
+// MOSTRAR RESULTADOS
+// =====================================
+
+function mostrarResultado(resultado) {
+    const contenedor = document.getElementById("resultado-contenedor");
+    contenedor.innerHTML = "";
+
+    // =====================================
+    // PASOS
+    // =====================================
+
+    if (resultado.pasos && resultado.pasos.length > 0) {
+        resultado.pasos.forEach((paso, index) => {
+
+            contenedor.innerHTML += `
+                <div class="paso">
+                    <h3>
+                        ${index + 1}.
+                        ${paso.titulo}
+
+                    </h3>
+                    <p>
+                        ${paso.descripcion}
+                    </p>
+
+                    <div class="formula">
+                        \\\[
+                            ${paso.latex}
+                        \\\]
+                    </div>
+                </div>
+            `;
+        });
+    }
+
+    // =====================================
+    // RESULTADO FINAL
+    // =====================================
+    contenedor.innerHTML += `
+
+        <div class="resultado-final">
+            <h2>
+                Resultado Final
+            </h2>
+            <h1>
+                ${resultado.resultado}
+            </h1>
+        </div>
+    `;
+
+    // =====================================
+    // RENDER LATEX
+    // =====================================
+    MathJax.typeset();
+}
