@@ -13,6 +13,11 @@ def resolver_enfriamiento(datos):
 
     try:
         # =========================
+        # UNIDAD DE TIEMPO
+        # =========================
+        unidad = datos.get("unidad_tiempo", "").strip() or "unidades de tiempo"
+
+        # =========================
         # VALIDAR CAMPOS REQUERIDOS
         # =========================
 
@@ -178,7 +183,7 @@ def resolver_enfriamiento(datos):
 
             pasos.append({
                 "titulo": "Evaluación final",
-                "descripcion": f"Se evalúa la función en t = {t_buscar}",
+                "descripcion": f"Se evalúa la función en t = {t_buscar} {unidad}",
                 "latex": latex(Eq(Function('T')(t_buscar), resultado_final))
             })
 
@@ -250,14 +255,14 @@ def resolver_enfriamiento(datos):
                     fr"\right)}}"
                     fr"{{-{round(float(valor_k),4)}}}"
                     fr"\\[10px]"
-                    + latex(Eq(Symbol("t"), tiempo_final))
+                    + fr"t \approx {tiempo_final} \text{{ {unidad}}}"
                     + fr"\end{{gathered}}"
             })
 
             return {
                 "modelo": "Ley de Enfriamiento",
                 "tipo": "tiempo",
-                "resultado": tiempo_final,
+                "resultado": f"{tiempo_final} {unidad}",
                 "pasos": pasos
             }
 

@@ -73,6 +73,40 @@ def resolver_crecimiento(datos):
             "latex": latex(Eq(P0, P0 * exp(0)))
         })
 
+        # ==================================================
+        # DETERMINAR CONSTANTE K Y UNIDAD DE TIEMPO
+        # ==================================================
+        unidad = datos.get("unidad_tiempo", "").strip() or "unidades de tiempo"
+        modo_dos_puntos = datos.get("modo_dos_puntos") in [True, "true"]
+
+        if modo_dos_puntos:
+            validar_campo_requerido(datos, "t1")
+            validar_campo_requerido(datos, "p1")
+            t1_val = validar_positivo(datos["t1"], "Tiempo 1 (t1)")
+            p1_val = validar_positivo(datos["p1"], "Población 1 (p1)")
+            
+            if p1_val <= P0:
+                raise ValueError("La cantidad en t1 (p1) debe ser mayor que la cantidad inicial para un modelo de crecimiento")
+            
+            k_val_sym = ln(p1_val / P0) / t1_val
+            k_val = round(float(k_val_sym.evalf()), 4)
+            
+            pasos.append({
+                "titulo": "Cálculo de la constante k",
+                "descripcion": f"Dado que en t1 = {t1_val} {unidad} la población es p1 = {p1_val}:",
+                "latex": 
+                    fr"\begin{{gathered}}"
+                    fr"P({t1_val}) = {P0} \cdot e^{{k \cdot {t1_val}}} = {p1_val} \\[10px]"
+                    fr"e^{{{t1_val}k}} = \frac{{{p1_val}}}{{{P0}}} \\[10px]"
+                    fr"{t1_val}k = \ln\left(\frac{{{p1_val}}}{{{P0}}}\right) \\[10px]"
+                    fr"k = \frac{{\ln\left({round(float(p1_val/P0), 4)}\right)}}{{{t1_val}}} \\[10px]"
+                    fr"\boxed{{k \approx {k_val}}}"
+                    fr"\end{{gathered}}"
+            })
+        else:
+            validar_campo_requerido(datos, "constante_crecimiento")
+            k_val = validar_positivo(datos["constante_crecimiento"], "Constante de crecimiento")
+
         # =========================
         # FUNCIÓN FINAL
         # =========================
@@ -92,10 +126,7 @@ def resolver_crecimiento(datos):
 
         if tipo_calculo == "cantidad":
 
-            if "constante_crecimiento" not in datos or "tiempo" not in datos:
-                raise ValueError("Se requieren 'constante_crecimiento' y 'tiempo'")
-            
-            k_val = validar_positivo(datos["constante_crecimiento"], "Constante de crecimiento")
+            validar_campo_requerido(datos, "tiempo")
             t_val = validar_positivo(datos["tiempo"], "Tiempo")
 
             resultado = funcion_final.subs({k: k_val, t: t_val})
@@ -103,7 +134,7 @@ def resolver_crecimiento(datos):
 
             pasos.append({
                 "titulo": "Evaluación",
-                "descripcion": f"Se evalúa la función en t = {t_val} con k = {k_val}:",
+                "descripcion": f"Se evalúa la función en t = {t_val} {unidad} con k = {k_val}:",
                 "latex": 
                     fr"\begin{{gathered}}"
                     fr"P({t_val}) = {P0} \cdot e^{{{k_val} \cdot {t_val}}} \\[10px]"
@@ -124,10 +155,7 @@ def resolver_crecimiento(datos):
 
         elif tipo_calculo == "tiempo":
 
-            if "constante_crecimiento" not in datos or "cantidad_objetivo" not in datos:
-                raise ValueError("Se requieren 'constante_crecimiento' y 'cantidad_objetivo'")
-            
-            k_val = validar_positivo(datos["constante_crecimiento"], "Constante de crecimiento")
+            validar_campo_requerido(datos, "cantidad_objetivo")
             cantidad_objetivo = validar_positivo(datos["cantidad_objetivo"], "Cantidad objetivo")
 
             if cantidad_objetivo < P0:
@@ -153,14 +181,14 @@ def resolver_crecimiento(datos):
                     fr"\frac{{{cantidad_objetivo}}}{{{P0}}} = e^{{{k_val}t}} \\[10px]"
                     fr"ln\left(\frac{{{cantidad_objetivo}}}{{{P0}}}\right) = {k_val}t \\[10px]"
                     fr"t = \frac{{1}}{{{k_val}}} ln\left(\frac{{{cantidad_objetivo}}}{{{P0}}}\right) \\[10px]"
-                    + latex(Eq(Symbol("t"), tiempo_final))
+                    + fr"t \approx {tiempo_final} \text{{ {unidad}}}"
                     + fr"\end{{gathered}}"
             })
 
             return {
                 "modelo": "Crecimiento Exponencial",
                 "tipo": "tiempo",
-                "resultado": tiempo_final,
+                "resultado": f"{tiempo_final} {unidad}",
                 "pasos": pasos
             }
 
@@ -169,11 +197,6 @@ def resolver_crecimiento(datos):
         # ==================================================
 
         elif tipo_calculo == "duplicacion":
-
-            if "constante_crecimiento" not in datos:
-                raise ValueError("Se requiere 'constante_crecimiento'")
-            
-            k_val = validar_positivo(datos["constante_crecimiento"], "Constante de crecimiento")
 
             pasos.append({
                 "titulo": "Tiempo de duplicación",
@@ -190,8 +213,7 @@ def resolver_crecimiento(datos):
                 "latex": 
                     fr"\begin{{gathered}}"
                     fr"t_{{d}} = \frac{{ln(2)}}{{{k_val}}} \\[10px]"
-                    + latex(Eq(Symbol("t_d"), tiempo_dup_final))
-                    + fr"\\[10px]"
+                    fr"t_d \approx {tiempo_dup_final} \text{{ {unidad}}} \\[10px]"
                     fr"\text{{Cantidad en }} t_{{d}} = {P0} \cdot e^{{{k_val} \cdot {tiempo_dup_final}}} = {P0} \cdot 2 = {P0*2}"
                     + fr"\end{{gathered}}"
             })
@@ -199,7 +221,7 @@ def resolver_crecimiento(datos):
             return {
                 "modelo": "Crecimiento Exponencial",
                 "tipo": "duplicacion",
-                "resultado": tiempo_dup_final,
+                "resultado": f"{tiempo_dup_final} {unidad}",
                 "pasos": pasos
             }
 

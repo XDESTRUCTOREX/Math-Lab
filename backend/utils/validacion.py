@@ -1,6 +1,8 @@
 # utils/validacion.py
 """Utilidades de validación para los modelos"""
 
+import re
+
 def validar_numero(valor, nombre_campo):
     """
     Valida que un valor pueda convertirse a float.
@@ -36,6 +38,16 @@ def validar_campo_requerido(datos, campo):
     if campo not in datos:
         raise ValueError(f"Campo requerido '{campo}' no encontrado")
     return datos[campo]
+
+
+def normalizar_expresion_simbolica(expresion):
+    """Convierte multiplicación implícita a multiplicación explícita para SymPy."""
+    if expresion is None:
+        return expresion
+    expresion = expresion.replace(" ", "")
+    expresion = re.sub(r'(?<=[0-9])(?=[A-Za-z\(])', '*', expresion)
+    expresion = re.sub(r'(?<=[A-Za-z\)])(?=[A-Za-z\(0-9])', '*', expresion)
+    return expresion
 
 
 def crear_respuesta_error(mensaje):

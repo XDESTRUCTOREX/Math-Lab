@@ -73,6 +73,40 @@ def resolver_decaimiento(datos):
             "latex": latex(Eq(N0, N0 * exp(0)))
         })
 
+        # ==================================================
+        # DETERMINAR CONSTANTE K Y UNIDAD DE TIEMPO
+        # ==================================================
+        unidad = datos.get("unidad_tiempo", "").strip() or "unidades de tiempo"
+        modo_dos_puntos = datos.get("modo_dos_puntos") in [True, "true"]
+
+        if modo_dos_puntos:
+            validar_campo_requerido(datos, "t1")
+            validar_campo_requerido(datos, "n1")
+            t1_val = validar_positivo(datos["t1"], "Tiempo 1 (t1)")
+            n1_val = validar_positivo(datos["n1"], "Cantidad 1 (n1)")
+            
+            if n1_val >= N0:
+                raise ValueError("La cantidad en t1 (n1) debe ser menor que la cantidad inicial para un modelo de decaimiento")
+            
+            k_val_sym = -ln(n1_val / N0) / t1_val
+            k_val = round(float(k_val_sym.evalf()), 4)
+            
+            pasos.append({
+                "titulo": "Cálculo de la constante k",
+                "descripcion": f"Dado que en t1 = {t1_val} {unidad} la cantidad es n1 = {n1_val}:",
+                "latex": 
+                    fr"\begin{{gathered}}"
+                    fr"N({t1_val}) = {N0} \cdot e^{{-k \cdot {t1_val}}} = {n1_val} \\[10px]"
+                    fr"e^{{-{t1_val}k}} = \frac{{{n1_val}}}{{{N0}}} \\[10px]"
+                    fr"-{t1_val}k = \ln\left(\frac{{{n1_val}}}{{{N0}}}\right) \\[10px]"
+                    fr"k = -\frac{{\ln\left({round(float(n1_val/N0), 4)}\right)}}{{{t1_val}}} \\[10px]"
+                    fr"\boxed{{k \approx {k_val}}}"
+                    fr"\end{{gathered}}"
+            })
+        else:
+            validar_campo_requerido(datos, "constante_decaimiento")
+            k_val = validar_positivo(datos["constante_decaimiento"], "Constante de decaimiento")
+
         # =========================
         # FUNCIÓN FINAL
         # =========================
@@ -92,10 +126,7 @@ def resolver_decaimiento(datos):
 
         if tipo_calculo == "cantidad":
 
-            if "constante_decaimiento" not in datos or "tiempo" not in datos:
-                raise ValueError("Se requieren 'constante_decaimiento' y 'tiempo'")
-            
-            k_val = validar_positivo(datos["constante_decaimiento"], "Constante de decaimiento")
+            validar_campo_requerido(datos, "tiempo")
             t_val = validar_positivo(datos["tiempo"], "Tiempo")
 
             resultado = funcion_final.subs({k: k_val, t: t_val})
@@ -103,7 +134,7 @@ def resolver_decaimiento(datos):
 
             pasos.append({
                 "titulo": "Evaluación",
-                "descripcion": f"Se evalúa la función en t = {t_val} con k = {k_val}:",
+                "descripcion": f"Se evalúa la función en t = {t_val} {unidad} con k = {k_val}:",
                 "latex": 
                     fr"\begin{{gathered}}"
                     fr"N({t_val}) = {N0} \cdot e^{{-{k_val} \cdot {t_val}}} \\[10px]"
@@ -124,10 +155,7 @@ def resolver_decaimiento(datos):
 
         elif tipo_calculo == "tiempo":
 
-            if "constante_decaimiento" not in datos or "cantidad_objetivo" not in datos:
-                raise ValueError("Se requieren 'constante_decaimiento' y 'cantidad_objetivo'")
-            
-            k_val = validar_positivo(datos["constante_decaimiento"], "Constante de decaimiento")
+            validar_campo_requerido(datos, "cantidad_objetivo")
             cantidad_objetivo = validar_positivo(datos["cantidad_objetivo"], "Cantidad objetivo")
 
             if cantidad_objetivo > N0:
@@ -153,14 +181,14 @@ def resolver_decaimiento(datos):
                     fr"\frac{{{cantidad_objetivo}}}{{{N0}}} = e^{{-{k_val}t}} \\[10px]"
                     fr"ln\left(\frac{{{cantidad_objetivo}}}{{{N0}}}\right) = -{k_val}t \\[10px]"
                     fr"t = -\frac{{1}}{{{k_val}}} ln\left(\frac{{{cantidad_objetivo}}}{{{N0}}}\right) \\[10px]"
-                    + latex(Eq(Symbol("t"), tiempo_final))
+                    + fr"t \approx {tiempo_final} \text{{ {unidad}}}"
                     + fr"\end{{gathered}}"
             })
 
             return {
                 "modelo": "Decaimiento Exponencial",
                 "tipo": "tiempo",
-                "resultado": tiempo_final,
+                "resultado": f"{tiempo_final} {unidad}",
                 "pasos": pasos
             }
 
@@ -169,11 +197,6 @@ def resolver_decaimiento(datos):
         # ==================================================
 
         elif tipo_calculo == "vida_media":
-
-            if "constante_decaimiento" not in datos:
-                raise ValueError("Se requiere 'constante_decaimiento'")
-            
-            k_val = validar_positivo(datos["constante_decaimiento"], "Constante de decaimiento")
 
             pasos.append({
                 "titulo": "Vida media",
@@ -190,8 +213,7 @@ def resolver_decaimiento(datos):
                 "latex": 
                     fr"\begin{{gathered}}"
                     fr"t_{{1/2}} = \frac{{ln(2)}}{{{k_val}}} \\[10px]"
-                    + latex(Eq(Symbol("t_{1/2}"), vida_media_final))
-                    + fr"\\[10px]"
+                    fr"t_{{1/2}} \approx {vida_media_final} \text{{ {unidad}}} \\[10px]"
                     fr"\text{{Cantidad en }} t_{{1/2}} = {N0} \cdot e^{{-{k_val} \cdot {vida_media_final}}} = \frac{{{N0}}}{{2}} = {N0/2}"
                     + fr"\end{{gathered}}"
             })
@@ -199,7 +221,7 @@ def resolver_decaimiento(datos):
             return {
                 "modelo": "Decaimiento Exponencial",
                 "tipo": "vida_media",
-                "resultado": vida_media_final,
+                "resultado": f"{vida_media_final} {unidad}",
                 "pasos": pasos
             }
 

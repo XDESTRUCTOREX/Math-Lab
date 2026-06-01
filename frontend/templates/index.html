@@ -1,79 +1,267 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" data-theme="red">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title> Sistema Inteligente </title>
-    <!-- ESTILOS -->
+    <meta name="description" content="MathLab - Resuelve ecuaciones diferenciales paso a paso con visualizaciones interactivas">
+    <meta name="theme-color" content="#0a0506">
+    <title>MathLab - Ecuaciones Diferenciales</title>
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/favicon.png') }}">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <!-- Estilos -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/global.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/sidebar.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/formulario.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/resultados.css') }}">
-    <!-- MATHJAX -->
-    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <!-- MathJax -->
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['\\(', '\\)']],
+                displayMath: [['\\[', '\\]']],
+                processEscapes: true
+            },
+            options: {
+                skipHtmlTags: ['script', 'noscript', 'style', 'textarea']
+            }
+        };
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
+
     <!-- JS -->
-    <script defer src="{{ url_for('static', filename='js/modelos.js') }}"></script>
-    <script defer src="{{ url_for('static', filename='js/formulario.js') }}"></script>
-    <script defer src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/modelos.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/formulario.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/visual-effects.js') }}" defer></script>
 </head>
 
 <body>
-    <div class="contenedor-principal">
-        <!-- SIDEBAR -->
-        <aside class="sidebar">
-            <div class="logo">
-                <h1> ∫ MathLab </h1>
-                <p> Ecuaciones Diferenciales </p>
+    <!-- ========== EPIC LOADING SCREEN ========== -->
+    <div id="loading-screen">
+        <div class="loader-bg-symbols" id="loader-bg-symbols"></div>
+        <div class="loader-content">
+            <div class="loader-logo">
+                <div class="loader-integral">∫</div>
+                <div class="loader-ring">
+                    <svg viewBox="0 0 120 120">
+                        <circle class="loader-ring-bg" cx="60" cy="60" r="52"/>
+                        <circle class="loader-ring-fill" cx="60" cy="60" r="52"/>
+                    </svg>
+                </div>
             </div>
-
-            <nav class="menu-modelos">
-                <button class="modelo-btn active" data-modelo="enfriamiento"> 🌡 Enfriamiento </button>
-                <button class="modelo-btn" data-modelo="mezclas"> 🧪 Mezclas </button>
-                <button class="modelo-btn" data-modelo="crecimiento"> 📈 Crecimiento </button>
-                <button class="modelo-btn" data-modelo="decaimiento"> 📉 Decaimiento </button>
-            </nav>
-        </aside>
-
-        <!-- PANEL -->
-        <main class="panel-central">
-            <!-- HEADER -->
-            <section class="header-panel">
-                <h2 id="titulo-modelo">  Ley de Enfriamiento </h2>
-                <p> Sistema inteligente para resolución matemática paso a paso. </p>
-            </section>
-
-            <!-- FORM -->
-            <section class="card formulario-card">
-                <div class="card-header">
-                    <h3> Datos del problema </h3>
-                </div>
-
-                <form id="formulario-dinamico"></form>
-
-                <button id="resolver-btn"> Resolver Modelo </button>
-            </section>
-
-            <!-- RESULTADOS -->
-            <section class="card resultados-card">
-                <div class="card-header">
-                    <h3> Procedimiento Matemático </h3>
-                </div>
-
-                <div id="resultado-contenedor">
-                    <div class="placeholder">
-                        <h2> Esperando resolución...</h2>
-                        <p> Selecciona un modelo y completa el formulario.</p>
-                    </div>
-
-                </div>
-
-            </section>
-
-        </main>
-
+            <h1 class="loader-title">MathLab</h1>
+            <p class="loader-subtitle">Ecuaciones Diferenciales</p>
+            <div class="loader-progress-bar">
+                <div class="loader-progress-fill" id="loader-progress-fill"></div>
+            </div>
+            <p class="loader-formula" id="loader-formula">dy/dx = f(x, y)</p>
+        </div>
     </div>
 
+    <!-- ========== CALCULATING OVERLAY (shown while solving) ========== -->
+    <div id="calculating-overlay">
+        <div class="calc-content">
+            <div class="calc-spinner">
+                <div class="calc-dot"></div>
+                <div class="calc-dot"></div>
+                <div class="calc-dot"></div>
+                <div class="calc-dot"></div>
+                <div class="calc-dot"></div>
+            </div>
+            <p class="calc-text">Resolviendo ecuacion...</p>
+            <p class="calc-formula">dy/dx = f(x, y)</p>
+            <div class="calc-symbols">
+                <span>∫</span><span>∑</span><span>∂</span><span>∞</span><span>∇</span><span>π</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Canvas for Advanced Particle Effects -->
+    <canvas id="particle-canvas"></canvas>
+
+    <!-- Mouse Follower Glow -->
+    <div id="mouse-follower" class="mouse-follower"></div>
+
+    <!-- Floating Math Symbols Container -->
+    <div id="math-particles" class="math-particles"></div>
+
+    <!-- Animated Background -->
+    <div class="bg-animation"></div>
+    <div class="aurora-container">
+        <div class="aurora aurora-1"></div>
+        <div class="aurora aurora-2"></div>
+        <div class="aurora aurora-3"></div>
+    </div>
+
+    <!-- Terms & Conditions Modal -->
+    <div class="modal-overlay" id="terms-modal">
+        <div class="modal-content">
+            <h2>Terminos y Condiciones</h2>
+            <h3>1. Aceptacion de los Terminos</h3>
+            <p>Al acceder y utilizar MathLab - Ecuaciones Diferenciales, usted acepta estar sujeto a estos terminos y condiciones. Si no esta de acuerdo con alguno de estos terminos, le rogamos que no utilice esta aplicacion.</p>
+
+            <h3>2. Uso Academico</h3>
+            <p>Esta aplicacion esta disenada con fines educativos y academicos. Los resultados proporcionados deben ser utilizados como herramientas de aprendizaje y verificacion, no como sustituto del analisis matematico riguroso. Los usuarios son responsables de validar los resultados obtenidos.</p>
+
+            <h3>3. Precision de los Resultados</h3>
+            <p>MathLab utiliza la biblioteca SymPy para el calculo simbolico de ecuaciones diferenciales. Aunque nos esforzamos por proporcionar resultados precisos, no garantizamos la ausencia de errores. Los resultados pueden variar segun la complejidad de la ecuacion ingresada y las limitaciones del motor de calculo.</p>
+
+            <h3>4. Limitacion de Responsabilidad</h3>
+            <p>Los desarrolladores de MathLab no seran responsables de ningun dano directo, indirecto, incidental o consecuente derivado del uso de esta aplicacion. Esto incluye, pero no se limita a, errores en calculos academicos, perdida de datos o resultados incorrectos utilizados en evaluaciones.</p>
+
+            <h3>5. Propiedad Intelectual</h3>
+            <p>Todo el contenido, diseno, codigo y material visual de MathLab esta protegido por derechos de propiedad intelectual. Queda prohibida la reproduccion, distribucion o modificacion sin autorizacion expresa de los autores.</p>
+
+            <h3>6. Privacidad</h3>
+            <p>MathLab no recopila datos personales de los usuarios. Los calculos se realizan en el servidor y no se almacenan datos de entrada ni de resultados despues de la sesion.</p>
+
+            <h3>7. Modificaciones</h3>
+            <p>Nos reservamos el derecho de modificar estos terminos en cualquier momento. Las modificaciones entraran en vigencia inmediatamente despues de su publicacion en esta pagina.</p>
+
+            <p style="color: var(--text-muted); font-size: 0.82rem; margin-top: 20px; text-align: center;">Ultima actualizacion: 2025</p>
+
+            <button class="modal-close" id="terms-close-btn">Entendido</button>
+        </div>
+    </div>
+
+    <div class="contenedor-principal">
+        <!-- SIDEBAR -->
+        <aside class="sidebar" id="main-sidebar">
+            <!-- Logo Section -->
+            <div class="logo">
+                <div class="logo-icon">∫</div>
+                <div class="logo-text">
+                    <h1>MathLab</h1>
+                    <p>Ecuaciones Diferenciales</p>
+                </div>
+                <!-- Clickable links below logo -->
+                <div class="logo-links">
+                    <span class="logo-link" id="logo-teoria-link">Teoria</span>
+                    <span class="logo-link-sep">·</span>
+                    <span class="logo-link" id="logo-terms-link">Terminos</span>
+                </div>
+            </div>
+
+            <!-- Toggle Sidebar Button -->
+            <button class="sidebar-toggle" id="sidebar-toggle" type="button" title="Colapsar menu">
+                <svg class="toggle-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="15 18 9 12 15 6"></polyline>
+                </svg>
+            </button>
+
+            <nav class="menu-modelos">
+                <span class="menu-section-label">Modelos</span>
+                <button class="modelo-btn active" data-modelo="enfriamiento" type="button">
+                    <span class="btn-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4v10.54a4 4 0 1 1-4 0V4a2 2 0 0 1 4 0Z"/></svg>
+                    </span>
+                    <span class="btn-label">Enfriamiento</span>
+                </button>
+                <button class="modelo-btn" data-modelo="mezclas" type="button">
+                    <span class="btn-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6l3 7-6 11-6-11 3-7z"/><path d="M9 3l3 7m3-7l-3 7"/></svg>
+                    </span>
+                    <span class="btn-label">Mezclas</span>
+                </button>
+                <button class="modelo-btn" data-modelo="crecimiento" type="button">
+                    <span class="btn-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
+                    </span>
+                    <span class="btn-label">Crecimiento</span>
+                </button>
+                <button class="modelo-btn" data-modelo="decaimiento" type="button">
+                    <span class="btn-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 17 13.5 8.5 8.5 13.5 2 7"/><polyline points="16 17 22 17 22 11"/></svg>
+                    </span>
+                    <span class="btn-label">Decaimiento</span>
+                </button>
+                <button class="modelo-btn" data-modelo="lineales" type="button">
+                    <span class="btn-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="20" x2="20" y2="4"/><line x1="4" y1="4" x2="20" y2="20"/></svg>
+                    </span>
+                    <span class="btn-label">Lineales</span>
+                </button>
+                <button class="modelo-btn" data-modelo="exactas" type="button">
+                    <span class="btn-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="2" x2="12" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/></svg>
+                    </span>
+                    <span class="btn-label">Exactas</span>
+                </button>
+            </nav>
+
+            <!-- Theme Switcher AT BOTTOM with toggle -->
+            <div class="sidebar-bottom">
+                <button class="theme-toggle-btn" id="theme-toggle-btn" type="button" title="Cambiar tema">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+                    <span class="btn-label">Tema</span>
+                </button>
+                <div class="theme-panel" id="theme-panel">
+                    <button class="theme-dot active" data-theme="red" type="button" title="Rojo"></button>
+                    <button class="theme-dot" data-theme="normal" type="button" title="Normal"></button>
+                    <button class="theme-dot" data-theme="dark" type="button" title="Oscuro"></button>
+                </div>
+                <div class="sidebar-footer">
+                    <p>MathLab v2.0</p>
+                </div>
+            </div>
+        </aside>
+
+        <!-- PANEL CENTRAL -->
+        <main class="panel-central">
+            <!-- SECCION RESOLVER -->
+            <div id="seccion-resolver">
+                <!-- HEADER -->
+                <section class="header-panel">
+                    <h2 id="titulo-modelo">Ley de Enfriamiento</h2>
+                    <p>Resolucion paso a paso con visualizaciones interactivas</p>
+                </section>
+
+                <!-- FORMULARIO -->
+                <section class="card formulario-card">
+                    <div class="card-header">
+                        <div class="card-header-icon">⚙</div>
+                        <h3>Datos del problema</h3>
+                    </div>
+                    <form id="formulario-dinamico"></form>
+                    <button id="resolver-btn" type="button">
+                        <span class="btn-text">Resolver Modelo</span>
+                        <span class="btn-spinner"></span>
+                    </button>
+                </section>
+
+                <!-- RESULTADOS -->
+                <section class="card resultados-card">
+                    <div class="card-header">
+                        <div class="card-header-icon">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                        </div>
+                        <h3>Procedimiento Matematico</h3>
+                    </div>
+                    <div id="resultado-contenedor">
+                        <div class="placeholder">
+                            <div class="placeholder-icon">∫</div>
+                            <h2>Esperando resolucion...</h2>
+                            <p>Selecciona un modelo y completa el formulario.</p>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- SECCION TEORIA -->
+            <div id="seccion-teoria" style="display: none;">
+                <!-- Se inyecta dinamicamente -->
+            </div>
+        </main>
+    </div>
 </body>
 
 </html>

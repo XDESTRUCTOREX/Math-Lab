@@ -10,6 +10,10 @@ def resolver_mezclas(datos):
     pasos = []
 
     try:
+        # =========================
+        # UNIDAD DE TIEMPO
+        # =========================
+        unidad = datos.get("unidad_tiempo", "").strip() or "unidades de tiempo"
 
         # =====================================================
         # VALIDAR CAMPOS REQUERIDOS
@@ -185,7 +189,7 @@ def resolver_mezclas(datos):
     
                 pasos.append({
                     "titulo": "Evaluación final",
-                    "descripcion": f"Se evalúa la función en t={t_buscar}:",
+                    "descripcion": f"Se evalúa la función en t={t_buscar} {unidad}:",
                     "latex": 
                         fr"\begin{{gathered}}"
                         fr"Q({t_buscar}) = {round(equilibrio,4)} + ({round(float(valor_A),4)})e^{{-{round(k,4)}({t_buscar})}} \\[10px]"
@@ -258,14 +262,14 @@ def resolver_mezclas(datos):
                         fr"e^{{-{round(k,4)}t}} = \frac{{{round(cantidad_objetivo-round(equilibrio,4),4)}}}{{{round(float(valor_A),4)}}} \\[10px]"
                         fr"ln\left( \frac{{{round(cantidad_objetivo-round(equilibrio,4),4)}}}{{{round(float(valor_A),4)}}} \right) = -{round(k,4)}t \\[10px]"
                         fr"t = \frac{{ln\left( \frac{{{round(cantidad_objetivo-round(equilibrio,4),4)}}}{{{round(float(valor_A),4)}}} \right)}}{{-{round(k,4)}}} \\[10px]"
-                        + latex(Eq(Symbol("t"), tiempo_final))
+                        + fr"t \approx {tiempo_final} \text{{ {unidad}}}"
                         + fr"\end{{gathered}}"
                 })
     
                 return {
                     "modelo": "Mezclas",
                     "tipo": "tiempo",
-                    "resultado": tiempo_final,
+                    "resultado": f"{tiempo_final} {unidad}",
                     "pasos": pasos
                 }
     

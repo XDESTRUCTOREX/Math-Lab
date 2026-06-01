@@ -7,6 +7,8 @@ from backend.routes.enfriamiento_routes import enfriamiento_bp
 from backend.routes.mezclas_routes import mezclas_bp
 from backend.routes.crecimiento_routes import crecimiento_bp
 from backend.routes.decaimiento_routes import decaimiento_bp
+from backend.routes.lineales_routes import lineales_bp
+from backend.routes.exactas_routes import exactas_bp
 
 app = Flask(
     __name__,
@@ -33,6 +35,8 @@ app.register_blueprint(enfriamiento_bp)
 app.register_blueprint(mezclas_bp)
 app.register_blueprint(crecimiento_bp)
 app.register_blueprint(decaimiento_bp)
+app.register_blueprint(lineales_bp)
+app.register_blueprint(exactas_bp)
 
 # =========================================
 # INICIAR SERVIDOR
