@@ -72,22 +72,31 @@ def resolver_enfriamiento(datos):
         })
 
         # =========================
-        # SOLUCIÓN GENERAL
+        # SOLUCIÓN GENERAL (desglosada)
         # =========================
 
         pasos.append({
-            "titulo": "Solución general",
-            "descripcion": "Resolviendo la ecuación diferencial:",
-            "latex": 
-                fr"\begin{{gathered}}"
-                fr"\frac{{dT}}{{dt}}=-k(T-{Ta}) \\[10px]"
-                fr"\frac{{dT}}{{T-{Ta}}}=-kdt \\[10px]"
-                fr"\int \frac{{dT}}{{T-{Ta}}}=\int -kdt \\[10px]"
-                fr"\ln|T-{Ta}|=-kt+C_1 \\[10px]"
-                fr"T-{Ta}=e^{{-kt+C_1}} \\[10px]"
-                fr"T-{Ta}=Ce^{{-kt}} \\[10px]"
-                fr"\boxed{{T(t)={Ta}+Ce^{{-kt}}}}"
-                fr"\end{{gathered}}"
+            "titulo": "Separación de variables",
+            "descripcion": "Se separan las variables para integrar:",
+            "latex": fr"\frac{{dT}}{{dt}}=-k(T-{Ta}) \\[10px] \frac{{dT}}{{T-{Ta}}}=-k dt"
+        })
+
+        pasos.append({
+            "titulo": "Integración",
+            "descripcion": "Se integran ambos lados respecto a sus variables:",
+            "latex": fr"\int \frac{{dT}}{{T-{Ta}}}=\int -k dt"
+        })
+
+        pasos.append({
+            "titulo": "Resultado de la integración",
+            "descripcion": "Se obtiene la expresión logarítmica:",
+            "latex": fr"\ln|T - {Ta}| = -kt + C_1"
+        })
+
+        pasos.append({
+            "titulo": "Exponenciación y forma general",
+            "descripcion": "Se despeja T aplicando la exponenciación:",
+            "latex": fr"T - {Ta} = e^{{-kt + C_1}} = C e^{{-kt}} \\[10px] T(t) = {Ta} + C e^{{-kt}}"
         })
 
         # =========================

@@ -1,4 +1,4 @@
-from sympy import symbols, sympify, integrate, exp, Eq, solve, latex, Symbol, simplify
+from sympy import symbols, sympify, integrate, exp, Eq, solve, latex, Symbol, simplify, diff
 from backend.utils.validacion import validar_campo_requerido, crear_respuesta_error, normalizar_expresion_simbolica
 
 def resolver_lineales(datos):
@@ -34,57 +34,87 @@ def resolver_lineales(datos):
         # 2. Factor integrante
         integral_P = integrate(P_x, x)
         mu = exp(integral_P)
-        
+
+        # Mostrar la integración de P(x)
+        pasos.append({
+            "titulo": "Integración de P(x)",
+            "descripcion": "Se calcula la integral de P(x) que aparece en el exponente del factor integrante:",
+            "latex": "\\int P(x) dx = {}".format(latex(integral_P))
+        })
+
+        # Mostrar mu(x)
         latex_mu = (
-            "\\begin{{gathered}}"
-            "\\mu(x) = e^{{\\int \\left({}\\right) dx}} \\\\[10px]"
-            "\\mu(x) = e^{{{}}} = {}"
-            "\\end{{gathered}}"
-        ).format(latex(P_x), latex(integral_P), latex(mu))
+            "\\begin{gathered}"
+            f"\\mu(x) = e^{{\\int P(x) dx}} = e^{{{latex(integral_P)}}} \\\\[10px]"
+            f"\\mu(x) = {latex(mu)}"
+            "\\end{gathered}"
+        )
 
         pasos.append({
             "titulo": "Factor integrante",
-            "descripcion": "Se calcula el factor integrante \\mu(x) = e^{\\int P(x) dx}:",
+            "descripcion": "Se define el factor integrante \mu(x):",
             "latex": latex_mu
         })
 
-        # 3. Multiplicación
+        # 3. Multiplicación y detalle del producto
         mu_q = mu * Q_x
-        latex_mult = "\\frac{{d}}{{dx}}\\left[{} \\cdot y\\right] = {} \\cdot \\left({}\\right) = {}".format(latex(mu), latex(mu), latex(Q_x), latex(mu_q))
+        # Mostrar que mu' = mu * P y la forma de derivada del producto
+        latex_mult = (
+            "\\begin{gathered}"
+            f"\\frac{{d}}{{dx}}\\left[{latex(mu)}\\, y\\right] = {latex(mu)} y' + {latex(diff(mu, x))} y \\\\[10px]"
+            f"\\text{{Pero}}\\quad {latex(diff(mu, x))} = {latex(mu)}\\cdot {latex(P_x)} \\\\[10px]"
+            f"\\therefore \\frac{{d}}{{dx}}\\left[{latex(mu)}\\, y\\right] = {latex(mu)} y' + {latex(mu)} {latex(P_x)} y = {latex(mu)}\\left(y' + {latex(P_x)} y\\right) \\\\[10px]"
+            f"= {latex(mu_q)}"
+            "\\end{gathered}"
+        )
+
         pasos.append({
-            "titulo": "Multiplicación",
-            "descripcion": "Multiplicando ambos lados por el factor integrante, la parte izquierda se condensa como la derivada del producto:",
+            "titulo": "Multiplicación por \mu(x)",
+            "descripcion": "Multiplicando la ecuación estándar por \mu(x) y usando que la izquierda es derivada de \mu y por y:",
             "latex": latex_mult
         })
 
         # 4. Integración
         integral_mu_q = integrate(mu_q, x)
-        
         latex_int = (
-            "\\begin{{gathered}}"
-            "\\int \\frac{{d}}{{dx}}\\left[{} y\\right] dx = \\int {} dx \\\\[10px]"
-            "{} y = {} + C"
-            "\\end{{gathered}}"
-        ).format(latex(mu), latex(mu_q), latex(mu), latex(integral_mu_q))
+            "\\begin{gathered}"
+            f"\\int \\frac{{d}}{{dx}}\\left[{latex(mu)} y\\right] dx = \\int {latex(mu_q)} dx \\\\[10px]"
+            f"{latex(mu)} y = {latex(integral_mu_q)} + C"
+            "\\end{gathered}"
+        )
 
         pasos.append({
             "titulo": "Integración",
-            "descripcion": "Se integran ambos lados con respecto a x:",
+            "descripcion": "Se integran ambos lados para obtener \mu(x) y en términos de la integral de \mu(x)Q(x):",
             "latex": latex_int
         })
 
-        # 5. Solución general
+        # 5. Solución general (desglosada)
+        # Ecuación intermedia antes de despejar y
+        pasos.append({
+            "titulo": "Ecuación intermedia",
+            "descripcion": "Se expresa la igualdad obtenida tras integrar:",
+            "latex": f"{latex(mu)} \; y = {latex(integral_mu_q)} + C"
+        })
+
+        # Despeje de y
         solucion_general_expr = (integral_mu_q + C) / mu
+        pasos.append({
+            "titulo": "Despeje de y",
+            "descripcion": "Se despeja y dividiendo por el factor integrante:",
+            "latex": f"y = \frac{{{latex(integral_mu_q)} + C}}{{{latex(mu)}}}"
+        })
+
+        # Simplificación
         try:
             solucion_general_simpl = simplify(solucion_general_expr)
         except Exception:
             solucion_general_simpl = solucion_general_expr
-            
-        latex_sol_gen = "\\boxed{{y(x) = {}}}".format(latex(solucion_general_simpl))
+
         pasos.append({
-            "titulo": "Solución general",
-            "descripcion": "Se despeja y para obtener la solución general:",
-            "latex": latex_sol_gen
+            "titulo": "Simplificación",
+            "descripcion": "Se simplifica la expresión algebraica final:",
+            "latex": "\\boxed{{y(x) = {}}}".format(latex(solucion_general_simpl))
         })
 
         if tipo_calculo == "particular":

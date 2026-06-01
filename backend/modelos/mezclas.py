@@ -119,21 +119,44 @@ def resolver_mezclas(datos):
             equilibrio = entrada / k
     
             pasos.append({
-                "titulo": "Solución general",
-                "descripcion": "Resolviendo la ecuación diferencial lineal de primer orden mediante factor integrante:",
-                "latex": 
-                    fr"\begin{{gathered}}"
-                    fr"\frac{{dQ}}{{dt}} + {round(k,4)}Q = {round(entrada,4)} \\[10px]"
-                    fr"\mu(t) = e^{{\int {round(k,4)} dt}} = e^{{{round(k,4)}t}} \\[10px]"
-                    fr"e^{{{round(k,4)}t}} \frac{{dQ}}{{dt}} + {round(k,4)}e^{{{round(k,4)}t}}Q = {round(entrada,4)}e^{{{round(k,4)}t}} \\[10px]"
-                    fr"\frac{{d}}{{dt}}(Qe^{{{round(k,4)}t}}) = {round(entrada,4)}e^{{{round(k,4)}t}} \\[10px]"
-                    fr"\int \frac{{d}}{{dt}}(Qe^{{{round(k,4)}t}}) dt = \int {round(entrada,4)}e^{{{round(k,4)}t}} dt \\[10px]"
-                    fr"Qe^{{{round(k,4)}t}} = \frac{{{round(entrada,4)}}}{{{round(k,4)}}}e^{{{round(k,4)}t}} + A \\[10px]"
-                    fr"Qe^{{{round(k,4)}t}} = {round(equilibrio,4)}e^{{{round(k,4)}t}} + A \\[10px]"
-                    fr"\boxed{{Q(t) = {round(equilibrio,4)} + Ae^{{-{round(k,4)}t}}}}"
-                    fr"\end{{gathered}}"
+                "titulo": "Forma estándar",
+                "descripcion": "Se escribe la ecuación diferencial en la forma estándar de una ecuación lineal de primer orden:",
+                "latex": fr"\frac{{dQ}}{{dt}} + {round(k,4)}Q = {round(entrada,4)}"
             })
-    
+
+            pasos.append({
+                "titulo": "Factor integrante",
+                "descripcion": "Se calcula el factor integrante \mu(t) = e^{\int k\,dt}:",
+                "latex": fr"\mu(t) = e^{{\int {round(k,4)} dt}} = e^{{{round(k,4)}t}}"
+            })
+
+            pasos.append({
+                "titulo": "Multiplicación por el factor integrante",
+                "descripcion": "Multiplicando toda la ecuación por \mu(t) se obtiene:",
+                "latex": 
+                    fr"e^{{{round(k,4)}t}} \frac{{dQ}}{{dt}} + {round(k,4)} e^{{{round(k,4)}t}} Q = {round(entrada,4)} e^{{{round(k,4)}t}}"
+            })
+
+            pasos.append({
+                "titulo": "Derivada del producto",
+                "descripcion": "La suma en el lado izquierdo es la derivada de Q e^{kt}, por lo que la ecuación se puede escribir como:",
+                "latex": fr"\frac{{d}}{{dt}}\left(Qe^{{{round(k,4)}t}}\right) = {round(entrada,4)} e^{{{round(k,4)}t}}"
+            })
+
+            pasos.append({
+                "titulo": "Integración",
+                "descripcion": "Se integran ambos lados con respecto a t para despejar Qe^{kt}:",
+                "latex": 
+                    fr"\int \frac{{d}}{{dt}}\left(Qe^{{{round(k,4)}t}}\right) dt = \int {round(entrada,4)} e^{{{round(k,4)}t}} dt \\\[10px]"
+                    fr"Qe^{{{round(k,4)}t}} = \frac{{{round(entrada,4)}}}{{{round(k,4)}}} e^{{{round(k,4)}t}} + A "
+            })
+
+            pasos.append({
+                "titulo": "Solución general",
+                "descripcion": "Despejando Q(t) se obtiene la solución general del sistema de mezclas:",
+                "latex": fr"\boxed{{Q(t) = {round(equilibrio,4)} + Ae^{{-{round(k,4)}t}}}}"
+            })
+
             # =====================================================
             # CALCULAR A
             # =====================================================

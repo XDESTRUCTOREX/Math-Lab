@@ -46,21 +46,31 @@ def resolver_decaimiento(datos):
         })
 
         # =========================
-        # SOLUCIÓN GENERAL
+        # SOLUCIÓN GENERAL (desglosada)
         # =========================
 
         pasos.append({
-            "titulo": "Solución general",
-            "descripcion": "Resolviendo la ecuación diferencial separable:",
-            "latex": 
-                fr"\begin{{gathered}}"
-                fr"\frac{{dN}}{{dt}}=-kN \\[10px]"
-                fr"\frac{{dN}}{{N}}=-kdt \\[10px]"
-                fr"\int \frac{{dN}}{{N}}=\int -kdt \\[10px]"
-                fr"ln|N|=-kt+C_1 \\[10px]"
-                fr"N=e^{{-kt+C_1}} \\[10px]"
-                fr"\boxed{{N(t)=N_0 e^{{-kt}}}}"
-                fr"\end{{gathered}}"
+            "titulo": "Separación de variables",
+            "descripcion": "Se separan las variables para integrar:",
+            "latex": fr"\frac{{dN}}{{dt}}=-kN \\[10px] \frac{{dN}}{{N}}=-kdt"
+        })
+
+        pasos.append({
+            "titulo": "Integración",
+            "descripcion": "Se integran ambos lados respecto a sus variables:",
+            "latex": fr"\int \frac{{dN}}{{N}}=\int -k dt"
+        })
+
+        pasos.append({
+            "titulo": "Resultado de la integración",
+            "descripcion": "Se obtiene la expresión logarítmica y se despeja la constante de integración:",
+            "latex": fr"\ln|N| = -kt + C_1"
+        })
+
+        pasos.append({
+            "titulo": "Exponenciación y solución general",
+            "descripcion": "Se aplica la exponenciación para despejar N(t):",
+            "latex": fr"N = e^{{-kt + C_1}} = e^{{C_1}} e^{{-kt}} \\[10px] N(t) = N_0 e^{{-kt}}"
         })
 
         # =========================

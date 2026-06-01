@@ -46,21 +46,31 @@ def resolver_crecimiento(datos):
         })
 
         # =========================
-        # SOLUCIÓN GENERAL
+        # SOLUCIÓN GENERAL (desglosada)
         # =========================
 
         pasos.append({
-            "titulo": "Solución general",
-            "descripcion": "Resolviendo la ecuación diferencial separable:",
-            "latex": 
-                fr"\begin{{gathered}}"
-                fr"\frac{{dP}}{{dt}}=kP \\[10px]"
-                fr"\frac{{dP}}{{P}}=kdt \\[10px]"
-                fr"\int \frac{{dP}}{{P}}=\int kdt \\[10px]"
-                fr"ln|P|=kt+C_1 \\[10px]"
-                fr"P=e^{{kt+C_1}} \\[10px]"
-                fr"\boxed{{P(t)=P_0 e^{{kt}}}}"
-                fr"\end{{gathered}}"
+            "titulo": "Separación de variables",
+            "descripcion": "Se separan las variables para integrar:",
+            "latex": fr"\frac{{dP}}{{dt}}=kP \\[10px] \frac{{dP}}{{P}}=kdt"
+        })
+
+        pasos.append({
+            "titulo": "Integración",
+            "descripcion": "Se integran ambos lados respecto a sus variables:",
+            "latex": fr"\int \frac{{dP}}{{P}}=\int k dt"
+        })
+
+        pasos.append({
+            "titulo": "Resultado de la integración",
+            "descripcion": "Se obtiene la expresión logarítmica y se despeja la constante de integración:",
+            "latex": fr"\ln|P| = kt + C_1"
+        })
+
+        pasos.append({
+            "titulo": "Exponenciación y solución general",
+            "descripcion": "Se aplica la exponenciación para despejar P(t):",
+            "latex": fr"P = e^{{kt + C_1}} = e^{{C_1}} e^{{kt}} \\[10px] P(t) = P_0 e^{{kt}}"
         })
 
         # =========================

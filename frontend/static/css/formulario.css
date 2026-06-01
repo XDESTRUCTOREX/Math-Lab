@@ -270,3 +270,17 @@
     margin-bottom: 4px;
     font-weight: 500;
 }
+/* ========================
+   ANIMACIÓN DE PULSO PARA BOTÓN LOADING
+   ======================== */
+#resolver-btn.loading {
+    pointer-events: none;
+    opacity: 0.85;
+    animation: btnPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes btnPulse {
+    0% { box-shadow: 0 4px 20px var(--sidebar-accent); transform: scale(1); }
+    50% { box-shadow: 0 8px 35px var(--sidebar-accent), 0 0 50px var(--sidebar-accent); transform: scale(1.02); }
+    100% { box-shadow: 0 4px 20px var(--sidebar-accent); transform: scale(1); }
+}

@@ -134,28 +134,55 @@ def resolver_exactas(datos):
         g_y_expr = simplify(g_y_expr)
         
         # Build latex without nested .format() calls to avoid issues with curly braces
-        latex_gy = (
+        latex_gprime = (
             "\\begin{gathered}"
-            f"\\frac{{\\partial}}{{\\partial y}}\\left({latex(integral_M_dx)}\\right) + g'(y) = N(x,y) \\\\[10px]"
+            f"\\frac{{\\partial}}{{\\partial y}}\\left({latex(integral_M_dx)}\\right) = {latex(d_dy_integral)} \\\\[10px]"
             f"{latex(d_dy_integral)} + g'(y) = {latex(N)} \\\\[10px]"
-            f"g'(y) = {latex(g_prime)} \\\\[10px]"
-            f"g(y) = \\int \\left({latex(g_prime)}\\right) dy = {latex(g_y_expr)}"
+            f"g'(y) = {latex(g_prime)}"
             "\\end{gathered}"
         )
 
         pasos.append({
-            "titulo": "Determinación de g(y)",
-            "descripcion": "Derivamos F(x,y) respecto a y e igualamos a N(x,y) para encontrar g'(y):",
+            "titulo": "Determinación de g'(y)",
+            "descripcion": "Se compara el resultado de la derivada parcial con N(x,y) y se despeja g'(y):",
+            "latex": latex_gprime
+        })
+
+        latex_gy = (
+            "\\begin{gathered}"
+            f"g'(y) = {latex(g_prime)} \\\\[10px]"
+            f"g(y) = \\int {latex(g_prime)} dy = {latex(g_y_expr)}"
+            "\\end{gathered}"
+        )
+
+        pasos.append({
+            "titulo": "Integración de g'(y)",
+            "descripcion": "Se integra g'(y) respecto a y para obtener g(y):",
             "latex": latex_gy
         })
 
-        # 4. Solución implícita F(x,y) = C
-        F_xy = integral_M_dx + g_y_expr
+        # 4. Construcción y simplificación de F(x,y)
+        F_xy_raw = integral_M_dx + g_y_expr
+
+        pasos.append({
+            "titulo": "Construcción de F(x,y)",
+            "descripcion": "Se construye la función potencial F(x,y) sumando la integral de M y g(y):",
+            "latex": f"F(x,y) = {latex(integral_M_dx)} + {latex(g_y_expr)}"
+        })
+
         try:
-            F_xy = simplify(F_xy)
+            F_xy_simpl = simplify(F_xy_raw)
         except Exception:
-            pass
-        
+            F_xy_simpl = F_xy_raw
+
+        pasos.append({
+            "titulo": "Simplificación de F(x,y)",
+            "descripcion": "Se simplifica la expresión de F(x,y):",
+            "latex": f"F(x,y) = {latex(F_xy_simpl)}"
+        })
+
+        # 5. Solución implícita F(x,y) = C
+        F_xy = F_xy_simpl
         latex_sol_gen = "\\boxed{{{} = C}}".format(latex(F_xy))
         pasos.append({
             "titulo": "Solución general implícita",
